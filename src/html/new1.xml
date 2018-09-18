@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AlarmEvent>
+	<EventId>1001</EventId>
+	<EventType>10001</EventType>
+	<EventLevel> 0 </EventLevel>
+	<InputSource>201</InputSource>
+	<InputSourceIndexcode></InputSourceIndexcode>
+	<InputSourceName></InputSourceName>
+	<EventName></EventName>
+	<AlarmExtraInfo>飞得更高</AlarmExtraInfo>
+	<LogId>0183688303314EBE9184AC8841C346B1</LogId>
+  <Status>1</Status>
+	<HappenTime>2012-08-22 19:21:21</HappenTime>
+	<EndTime>2012-08-22 19:21:21</EndTime>
+</AlarmEvent>

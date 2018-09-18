@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo_obj</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/OBJLoader.js"></script>
+    <script type="text/javascript" src="../libs/DDSLoader.js"></script>
+    <script type="text/javascript" src="../libs/MTLLoader.js"></script>
+    <script type="text/javascript" src="../libs/OrbitControls.js"></script>
+    <script type="text/javascript">
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+      var mesh = null;
+
+      function init() {
+        renderer = new THREE.WebGLRenderer({
+          canvas:document.getElementById("mainCanvas")
+        });
+        renderer.setClearColor(0x32c8a9);//画布颜色
+        scene = new THREE.Scene();//创建场景
+
+        camera = new THREE.OrthographicCamera(-200, 200, 200, -200, 0.1, 200);//正交投影照相机
+        camera.position.set(0, 0, 70);//相机位置
+        camera.lookAt(new THREE.Vector3(0, 0, 0));//lookAt()设置相机所看的位置
+        scene.add(camera);//把相机添加到场景中
+
+        var onProgress = function(xhr) {
+          if (xhr.lengthComputable) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log(Math.round(percentComplete, 2) + '% downloaded');
+          }
+        };
+
+        var onError = function(xhr) {};
+        THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
+
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setPath('../resource/');
+        mtlLoader.load('file.mtl', function(materials) {
+
+          materials.preload();
+
+          var objLoader = new THREE.OBJLoader();
+          objLoader.setMaterials(materials);
+          objLoader.setPath('../resource/');
+          objLoader.load('file.obj', function(object) {
+            mesh = object;//储存到全局变量中
+            // object.position.z = 200;
+            // camera.position.set(0, 0, 270);//相机位置
+            scene.add(object);
+          }, onProgress, onError);
+
+        });
+
+        var light = new THREE.DirectionalLight(0xffffff);//光源颜色
+        light.position.set(0, 80, 20);//光源位置
+        scene.add(light);//光源添加到场景中
+
+        //添加坐标系
+        var ax = new THREE.AxesHelper(100);
+        //全局雾化
+        scene.fog = new THREE.Fog(0xffffff, 0.015, 1000)
+        scene.add(ax);
+
+        initControls();
+        render();//渲染界面
+      }
+
+      var delta;
+      function render() {
+        delta = clock.getDelta();
+        controls.update(delta);
+        requestAnimationFrame(render);
+        renderer.render(scene, camera);
+      }
+
+      //用户交互插件 鼠标左键按住旋转，右键按住平移，滚轮缩放
+      var controls;
+      var clock;
+      function initControls() {
+
+        controls = new THREE.OrbitControls( camera, renderer.domElement );
+        clock = new THREE.Clock();
+
+        // 如果使用animate方法时，将此函数删除
+        //controls.addEventListener( 'change', render );
+        // 使动画循环使用时阻尼或自转 意思是否有惯性
+        controls.enableDamping = true;
+        //动态阻尼系数 就是鼠标拖拽旋转灵敏度
+        //controls.dampingFactor = 0.25;
+        //是否可以缩放
+        controls.enableZoom = true;
+        //是否自动旋转
+        controls.autoRotate = false;
+        //设置相机距离原点的最远距离
+        controls.minDistance = 200;
+        //设置相机距离原点的最远距离
+        controls.maxDistance = 600;
+        //是否开启右键拖拽
+        controls.enablePan = true;
+      }
+    </script>
+</head>
+<body onload="init()">
+
+<div>
+  <canvas id="mainCanvas" width="1440px" height="900px"></canvas>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demo_obj</title>
+    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="../libs/OBJLoader.js"></script>
+    <script type="text/javascript" src="../libs/DDSLoader.js"></script>
+    <script type="text/javascript" src="../libs/MTLLoader.js"></script>
+    <script type="text/javascript" src="../libs/OrbitControls.js"></script>
+    <script type="text/javascript">
+      var scene = null;
+      var camera = null;
+      var renderer = null;
+      var mesh = null;
+      var pivot1 = null;
+      var controller = null;
+
+      function init() {
+        renderer = new THREE.WebGLRenderer({
+          canvas:document.getElementById("mainCanvas")
+        });
+        renderer.setClearColor(0x32c8a9);//画布颜色
+        scene = new THREE.Scene();//创建场景
+
+        camera = new THREE.OrthographicCamera(-200, 200, 200, -200, 0.1, 200);//正交投影照相机
+        camera.position.set(0, 70, 70);//相机位置
+        camera.lookAt(new THREE.Vector3(0, 0, 0));//lookAt()设置相机所看的位置
+        scene.add(camera);//把相机添加到场景中
+
+        var onProgress = function(xhr) {
+          if (xhr.lengthComputable) {
+            var percentComplete = xhr.loaded / xhr.total * 100;
+            console.log(Math.round(percentComplete, 2) + '% downloaded');
+          }
+        };
+
+        var onError = function(xhr) {};
+        THREE.Loader.Handlers.add(/\.dds$/i, new THREE.DDSLoader());
+
+        var mtlLoader = new THREE.MTLLoader();
+        mtlLoader.setPath('../resource/');
+        mtlLoader.load('file.mtl', function(materials) {
+
+          materials.preload();
+
+          var objLoader = new THREE.OBJLoader();
+          pivot1 = new THREE.Object3D();
+          scene.add(pivot1);
+          objLoader.setMaterials(materials);
+          objLoader.setPath('../resource/');
+          objLoader.load('file.obj', function(object) {
+            mesh = object;//储存到全局变量中
+            scene.add(object);
+            pivot1.add(object);
+            render();
+
+          }, onProgress, onError);
+
+        });
+
+        var light = new THREE.DirectionalLight(0xffffff);//光源颜色
+        light.position.set(0, 80, 20);//光源位置
+        scene.add(light);//光源添加到场景中
+        render();//渲染界面
+
+        document.addEventListener( 'mousedown', onMouseDown, false );
+        document.addEventListener( 'mouseup', onMouseup, false );
+        initController();
+      }
+
+      function initController() {
+        controller = new THREE.OrbitControls(camera,renderer.domElement);
+        clock = new THREE.Clock();
+        controller.enableZoom = true;
+        //设置相机距离原点的最远距离
+        controller.minDistance = 200;
+        //设置相机距离原点的最远距离
+        controller.maxDistance = 600;
+        //是否开启右键拖拽
+        controller.enablePan = true;
+        //关闭平移
+        controller.enablePan = true;
+        //关闭旋转
+        controller.enableRotate = false;
+        //是否可以缩放
+        controls.enableZoom = true;
+      }
+
+      var rotateStart;
+      var mouseDown;
+      var mouseX;
+      rotateStart = new THREE.Vector2();
+
+      /*
+          鼠标移动控制模型旋转思想：
+          当按下鼠标时及时当前鼠标的水平坐标clientX1，在鼠标移动的过程中不断触发onMouseMove事件，
+          不停的记录鼠标的当前坐标clientX2，由当前坐标减去记录的上一个水平坐标，
+          并且将当前的坐标付给上一个坐标clientX1，计算两个坐标的之间的差clientX2-clientX1，
+          将得到的差值除以一个常量（这个常量可以根据自己的需要调整），得到旋转的角度
+      */
+      function onMouseDown(event){
+        event.preventDefault();
+        mouseDown = true;
+        mouseX = event.clientX;//出发事件时的鼠标指针的水平坐标
+
+        // rotateStart.set( event.clientX, event.clientY );
+        document.addEventListener( 'mousemove', onMouseMove2, false );
+      }
+
+      function onMouseup(event){
+        mouseDown = false;
+
+        document.removeEventListener("mousemove", onMouseMove2);
+      }
+
+      function onMouseMove2(event){
+        if(!mouseDown){
+          return;
+        }
+        rotateScene(event);
+      }
+
+      //设置模型旋转速度，可以根据自己的需要调整
+      function rotateScene(event){
+        //设置旋转方向和移动方向相反，所以加了个负号
+        var SERIAL = 300;
+        var deltaX = event.clientX - mouseX;
+        mouseX = event.clientX;
+        //deg 设置模型旋转的弧度
+        pivot1.rotation.y += deltaX/SERIAL;
+        render();
+      }
+
+      function render() {
+        // delta = clock.getDelta();
+        // controller.update(delta);
+        // requestAnimationFrame(render);
+        renderer.render(scene, camera);
+      }
+    </script>
+</head>
+<body onload="init()">
+
+<div>
+  <canvas id="mainCanvas" width="1440px" height="900px"></canvas>
+</div>
+
+</body>
+</html>
