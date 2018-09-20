@@ -48,6 +48,10 @@
           wc.hideLoading()
           wc.setOption(option)
         });
+
+        window.onresize = function() {
+          wc.resize();
+        };
     </script>
 </body>
 </html>
