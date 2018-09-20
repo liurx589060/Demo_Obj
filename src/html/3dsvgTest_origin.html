@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>企业分析</title>
+  <!-- 引入 echarts.js -->
+  <script src="./js/jquery-3.0.0.min.js"></script>
+  <script src='js/jquery.svg3dtagcloud.min.js'></script>
+  </head>
+
+  <div id='holder'></div><p></p>
+
+
+    <script type="text/javascript">
+
+    //--------------------------3D 词云图 -----------------
+
+    //var fWidth = Math.min($(window).height(),$(window).width());
+    var settings = {
+      entries: [],//数据
+      width: 800,//宽度
+      height: 800,//高度
+      radius: '55%',
+      radiusMin: 30,
+      bgDraw: true,//是否显示背景
+      bgColor: '#060d27',//背景颜色
+      opacityOver: 1.00,
+      opacityOut: 0.05,
+      opacitySpeed: 6,
+      fov: 1500,
+      speed: 0.1,//旋转的速度
+      fontFamily: 'Oswald, Arial, sans-serif',
+      fontSize: '18',//默认字体大小
+      fontColor: '#8B4513',//默认字体颜色
+      fontWeight: 'normal',//bold
+      fontStyle: 'normal',//italic
+      fontStretch: 'normal',//wider, narrower, ultra-condensed, extra-condensed, condensed, semi-condensed, semi-expanded, expanded, extra-expanded, ultra-expanded
+      fontToUpperCase: true,
+      tooltipFontFamily: 'Oswald, Arial, sans-serif',
+      tooltipFontSize: '11',
+      tooltipFontColor: 'red',
+      tooltipFontWeight: 'normal',//bold
+      tooltipFontStyle: 'normal',//italic
+      tooltipFontStretch: 'normal',//wider, narrower, ultra-condensed, extra-condensed, condensed, semi-condensed, semi-expanded, expanded, extra-expanded, ultra-expanded
+      tooltipFontToUpperCase: false,
+      tooltipTextAnchor: 'left',
+      tooltipDiffX: 0,
+      tooltipDiffY: 10,
+      link:false
+
+    };
+
+    $( document ).ready( function() {
+      $.getJSON("./files/cay_data.json",function (datas) {
+        var count = datas.length;
+        var newDatas = [];
+        for(var i = 0 ; i < count ; i++) {
+          var data = datas[i];
+          var colors = ['#4889ff','#679dff','#84b0ff','#b2cdff'];
+          var size = parseFloat(data['fontSize']);
+          if(size >= 10*10000) {
+            data['fontSize'] = size/1000;
+            data['fontColor'] = colors[0];
+
+            newDatas.push(data);
+          }else if(size >= 800 && size < 10*10000) {
+            var subSize = 0;
+            if(size >= 800 && size < 2000) {
+              subSize = size/40;
+            }else if(size >= 2000 && size < 10000) {
+              subSize = size/200;
+            }else if(size >= 10000 && size < 5*10000) {
+              subSize = size/500;
+            }else if(size >= 5*10000 && size < 10*10000) {
+              subSize = size/800;
+            }
+            data['fontSize'] = subSize;
+            data['fontColor'] = colors[1];
+
+            newDatas.push(data);
+          }else if(size >= 400 && size < 800) {
+            data['fontSize'] = size/40;
+            data['fontColor'] = colors[2];
+            newDatas.push(data);
+          }else if(size >= 15 && size < 400) {
+            data['fontSize'] = size/15;
+            data['fontColor'] = colors[3];
+            newDatas.push(data);
+          }
+        }
+
+        newDatas.sort(randomsort);
+        setData(newDatas)
+      });
+    } );
+
+    function randomsort(a, b) {
+      return Math.random()>.5 ? -1 : 1;
+    }
+
+    function setData(datas) {
+      settings.entries = datas;
+      $( '#holder' ).svg3DTagCloud( settings );
+    }
+  </script>
+  </body>
+</html>
