@@ -17,7 +17,11 @@
           var size = parseInt(datas[i]['fontSize']);
           var color = '';
           var colors = ['#4889ff','#679dff','#84b0ff','#b2cdff'];
-          if(size >= 10*10000) {
+          if(size >= 20*10000) {
+            size = 1000*size;
+            color = colors[0];
+          }else if(size >= 10*10000) {
+            size = 0.5*size;
             color = colors[0];
           }else if(size >= 800 && size < 10*10000) {
             color = colors[1];
@@ -46,8 +50,8 @@
         // })
 
         var option = {
-          fontSizeFactor: 0.01,                                    // 当词云值相差太大，可设置此值进字体行大小微调，默认0.1
-          maxFontSize: 40,                                        // 最大fontSize，用来控制weightFactor，默认60
+          fontSizeFactor: 0.05,                                    // 当词云值相差太大，可设置此值进字体行大小微调，默认0.1
+          maxFontSize: 80,                                        // 最大fontSize，用来控制weightFactor，默认60
           minFontSize: 1,
           list: data,
           color: '#15a4fa',
