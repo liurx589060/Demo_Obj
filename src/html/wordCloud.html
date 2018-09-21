@@ -5,7 +5,7 @@
     <title>wordCloud</title>
 </head>
 <body>
-    <div id="container" style="height: 880px; width: 880px;"></div>
+    <div id="container" style="height: 880px; width: 880px; background:#060d27"></div>
     <script src="./js/js2wordcloud.js"></script>
     <script src="./js/jquery-3.0.0.min.js"></script>
     <script>
@@ -47,12 +47,13 @@
 
         var option = {
           fontSizeFactor: 0.01,                                    // 当词云值相差太大，可设置此值进字体行大小微调，默认0.1
-          maxFontSize: 35,                                        // 最大fontSize，用来控制weightFactor，默认60
+          maxFontSize: 40,                                        // 最大fontSize，用来控制weightFactor，默认60
           minFontSize: 1,
           list: data,
           color: '#15a4fa',
           imageShape: './image/chenanyuan_logo_black.png',
-          ellipticity: 1
+          ellipticity: 1,
+          backgroundColor:'#060d27'
         }
 
         // wc.hideLoading()
