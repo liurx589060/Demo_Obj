@@ -1,9 +1,11 @@
-var radius = 200;
+var radius = 180;
 var dtr = Math.PI/180;
-var d=400;
+var d=360;
 
 var mcList = [];
 var active = false;
+var avtive_availble = true;
+var autoStop = true;
 var lasta = 1;
 var lastb = 1;
 var distr = true;
@@ -12,6 +14,8 @@ var size=250;
 
 var mouseX=0;
 var mouseY=0;
+var mouseOriginX=0;
+var mouseOriginY=0;
 
 var howElliptical=1;
 
@@ -27,23 +31,29 @@ window.onload=function ()
 
   oDiv.onmouseover=function ()
   {
-    active=true;
+    if(avtive_availble) {
+      active=true;
+    }
   };
 
   oDiv.onmouseout=function ()
   {
-    active=false;
+    if(avtive_availble) {
+      active=false;
+    }
   };
 
   oDiv.onmousemove=function (ev)
   {
-    var oEvent=window.event || ev;
+    if(avtive_availble) {
+      var oEvent=window.event || ev;
 
-    mouseX=oEvent.clientX-(oDiv.offsetLeft+oDiv.offsetWidth/2);
-    mouseY=oEvent.clientY-(oDiv.offsetTop+oDiv.offsetHeight/2);
+      mouseX=oEvent.clientX-(oDiv.offsetLeft+oDiv.offsetWidth/2);
+      mouseY=oEvent.clientY-(oDiv.offsetTop+oDiv.offsetHeight/2);
 
-    mouseX/=5;
-    mouseY/=5;
+      mouseX/=5;
+      mouseY/=5;
+    }
   };
 
   $.getJSON ("./files/cay_data.json", function (datas)
@@ -63,25 +73,36 @@ function update()
 
 	if(active)
 	{
-		a = (-Math.min( Math.max( -mouseY, -size ), size ) / radius ) * tspeed;
-		b = (Math.min( Math.max( -mouseX, -size ), size ) / radius ) * tspeed;
+		a = (-Math.min( Math.max( -mouseY, -size ), size ) / radius );
+		b = (Math.min( Math.max( -mouseX, -size ), size ) / radius );
 	}
 	else
 	{
-		a = lasta * 0.98;
-		b = lastb * 0.98;
+	  var speeda = (-Math.min( Math.max( -mouseOriginX, -size ), size ) / radius );
+	  var speedb = (Math.min( Math.max( -mouseOriginX, -size ), size ) / radius );
+	  if(autoStop)
+    {
+      a = lasta * 0.98;
+      b = lastb * 0.98;
+    }
+    else
+    {
+      a = speeda;
+      b = speedb;
+    }
+
 	}
 
 	lasta=a;
 	lastb=b;
 
-	if(Math.abs(a)<=0.01 && Math.abs(b)<=0.01)
+	if(Math.abs(a*tspeed)<=0.01 && Math.abs(b*tspeed)<=0.01)
 	{
 		return;
 	}
 
 	var c=0;
-	sineCosine(a,b,c);
+	sineCosine(a*tspeed,b*tspeed,c);
 	for(var j=0;j<mcList.length;j++)
 	{
 		var rx1=mcList[j].cx;
@@ -301,4 +322,31 @@ function refresh(datas) {
   positionAll();
 
   interval = setInterval(update, 30);
+}
+
+function setOption(option) {
+  if(typeof(option['radius']) != "undefined") {
+    radius = option['radius'];
+    mouseOriginX = radius/4;
+    mouseOriginY = radius/4;
+  }
+
+  if(typeof(option['speed']) != "undefined") {
+    tspeed = option['speed'];
+  }
+
+  if(typeof(option['avtive_availble']) != "undefined") {
+    avtive_availble = option['avtive_availble'];
+  }
+
+  if(typeof(option['autoStop']) != "undefined") {
+    autoStop = option['autoStop'];
+  }
+}
+
+function test() {
+  $.getJSON ("./files/a.json", function (datas)
+  {
+    refresh(datas);
+  });
 }
